@@ -181,7 +181,7 @@ from pipeline_mako import render_require_js_path_overrides
 
 <body class="${static.dir_rtl()} <%block name='bodyclass'/> lang_${LANGUAGE_CODE}">
 
-<% gtm_acct = static.get_value("GOOGLE_TAG_MANAGER_ACCOUNT", settings.GOOGLE_TAG_MANAGER_ACCOUNT) %>
+% if gtm_acct:
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=${gtm_acct | n, js_escaped_string}"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
