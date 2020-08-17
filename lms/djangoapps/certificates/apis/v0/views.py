@@ -7,13 +7,43 @@ from rest_framework.response import Response
 from edx_rest_framework_extensions import permissions
 from edx_rest_framework_extensions.auth.jwt.authentication import JwtAuthentication
 from edx_rest_framework_extensions.auth.session.authentication import SessionAuthenticationAllowInactiveUser
-from lms.djangoapps.certificates.api import get_certificate_for_user
+from lms.djangoapps.certificates.api import get_certificate_for_user, get_all_certificates
 from opaque_keys import InvalidKeyError
 from opaque_keys.edx.keys import CourseKey
 from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiveUser
 
 
 log = logging.getLogger(__name__)
+
+class CertificatesView(GenericAPIView):
+    authentication_classes = (
+        JwtAuthentication,
+        OAuth2AuthenticationAllowInactiveUser,
+        SessionAuthenticationAllowInactiveUser,
+    )
+
+    permission_classes = (permissions.JWT_RESTRICTED_APPLICATION_OR_USER_ACCESS,)
+
+    required_scopes = ['certificates:read']
+    def get(self, request):
+        certs = get_all_certificates()
+        jsoncerts = []
+        for cert in certs:
+            jsoncerts.append( {
+                "username": cert.get('username'),
+                "course_id": six.text_type(cert.get('course_key')),
+                "certificate_type": cert.get('type'),
+                "created_date": cert.get('created'),
+                "status": cert.get('status'),
+                "is_passing": cert.get('is_passing'),
+                "download_url": cert.get('download_url'),
+                "grade": cert.get('grade')
+            })
+        return Response(
+            {
+                "items": jsoncerts
+            }
+        )
 
 
 class CertificatesDetailView(GenericAPIView):
