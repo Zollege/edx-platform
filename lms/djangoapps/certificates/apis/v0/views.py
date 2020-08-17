@@ -15,10 +15,10 @@ from openedx.core.lib.api.authentication import OAuth2AuthenticationAllowInactiv
 
 log = logging.getLogger(__name__)
 
-class CertificatesView(APIView):
+class CertificatesView(GenericAPIView):
     authentication_classes = (
         JwtAuthentication,
-        BearerAuthenticationAllowInactiveUser,
+        OAuth2AuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
 
