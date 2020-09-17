@@ -306,6 +306,7 @@ def _update_context_with_user_info(context, user, user_certificate):
     """
     user_fullname = user.profile.name
     context['username'] = user.username
+    context['user_meta'] = user.profile.meta
     context['course_mode'] = user_certificate.mode
     context['accomplishment_user_id'] = user.id
     context['accomplishment_copy_name'] = user_fullname
