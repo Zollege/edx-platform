@@ -454,6 +454,7 @@ class GradebookView(GradeViewMixin, PaginatedAPIView):
             breakdown.append({
                 'attempted': attempted,
                 'category': subsection_grade.format,
+                'chapter_name': subsection.chapter_name,
                 'is_graded': subsection_grade.graded,
                 'label': short_label,
                 'letter_grade': course_grade.letter_grade,
@@ -556,6 +557,9 @@ def graded_subsections_for_course(course_structure):
         for subsection_key in course_structure.get_children(chapter_key):
             subsection = course_structure[subsection_key]
             if subsection.graded:
+                # Store the chapter name in the subsection BlockData in order
+                # to use that in the gradebook api
+                subsection.chapter_name = course_structure[chapter_key].display_name
                 yield subsection
 
 
