@@ -67,7 +67,7 @@ from ..models import (
     UserRetirementPartnerReportingStatus,
     UserRetirementStatus
 )
-from .api import get_account_settings, update_account_settings, update_profile
+from .api import get_account_settings, update_account_settings
 from .permissions import CanDeactivateUser, CanRetireUser
 from .serializers import UserRetirementPartnerReportSerializer, UserRetirementStatusSerializer
 from .signals import (
@@ -108,50 +108,6 @@ def request_requires_username(function):
         return function(self, request)
     return wrapper
 
-class ProfileView(ViewSet):
-
-    authentication_classes = (
-        JwtAuthentication, BearerAuthenticationAllowInactiveUser, SessionAuthenticationAllowInactiveUser
-    )
-    permission_classes = (permissions.IsAuthenticated,)
-    parser_classes = (MergePatchParser,)
-
-    def retrieve(self, request, username):
-        """
-        GET /api/user/v1/accounts/{username}/
-        """
-        try:
-            account_settings = get_account_settings(
-                request, [username], view=request.query_params.get('view'))
-        except UserNotFound:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        return Response(account_settings[0])
-
-    def partial_update(self, request, username):
-        """
-        PATCH /api/user/v1/profile/{username}/
-        """
-        try:
-            with transaction.atomic():
-                update_profile(request.user, request.data, username=username)
-                account_settings = get_account_settings(request, [username])[0]
-        except UserNotAuthorized:
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        except UserNotFound:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        except AccountValidationError as err:
-            return Response({"field_errors": err.field_errors}, status=status.HTTP_400_BAD_REQUEST)
-        except AccountUpdateError as err:
-            return Response(
-                {
-                    "developer_message": err.developer_message,
-                    "user_message": err.user_message
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        return Response(account_settings)
 
 class AccountViewSet(ViewSet):
     """

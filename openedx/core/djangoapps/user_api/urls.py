@@ -13,8 +13,7 @@ from .accounts.views import (
     AccountRetirementView,
     AccountViewSet,
     DeactivateLogoutView,
-    LMSAccountRetirementView,
-    ProfileView
+    LMSAccountRetirementView
 )
 from .preferences.views import PreferencesDetailView, PreferencesView
 from .verification_api.views import IDVerificationStatusView
@@ -29,11 +28,6 @@ ACCOUNT_LIST = AccountViewSet.as_view({
 })
 
 ACCOUNT_DETAIL = AccountViewSet.as_view({
-    'get': 'retrieve',
-    'patch': 'partial_update',
-})
-
-PROFILE = ProfileView.as_view({
     'get': 'retrieve',
     'patch': 'partial_update',
 })
@@ -85,11 +79,6 @@ urlpatterns = [
         r'^v1/accounts$',
         ACCOUNT_LIST,
         name='accounts_detail_api'
-    ),
-    url(
-        r'^v1/profile/{}$'.format(settings.USERNAME_PATTERN),
-        PROFILE,
-        name='profile_api'
     ),
     url(
         r'^v1/accounts/{}$'.format(settings.USERNAME_PATTERN),

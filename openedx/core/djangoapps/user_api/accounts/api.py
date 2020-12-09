@@ -4,7 +4,7 @@ Programmatic integration point for User API Accounts sub-application
 """
 import datetime
 from pytz import UTC
-import json
+
 from django.utils.translation import override as override_language, ugettext as _
 from django.db import transaction, IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
@@ -104,44 +104,6 @@ def get_account_settings(request, usernames=None, configuration=None, view=None)
 
     return serialized_users
 
-@helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
-def update_profile(requesting_user, update, username=None):
-    """Update user profile information.
-    currently only handles meta
-    
-    """
-    # Get user
-    if username is None:
-        username = requesting_user.username
-    user, user_profile = _get_user_and_profile(username)
-    """
-    1. if existing meta is blank or not an object, enforce that provided meta is JSON and override entire field
-    2. if provided meta is invalid json, raise error
-    3. if both are valid json, merge
-    """
-    if not requesting_user.is_superuser:
-        raise errors.UserNotAuthorized()
-    try:
-        updated_meta = json.loads(update["meta"])
-    except json.decoder.JSONDecodeError as err:
-        raise AccountValidationError(['meta must be json'])
-
-    
-    if not user_profile.meta:
-        user_profile.meta = update["meta"]
-        user_profile.save()
-        return
-    try:
-        meta_to_update =  json.loads(user_profile.meta)
-    except json.decoder.JSONDecodeError as err:
-        user_profile.meta = update["meta"]
-        user_profile.save()
-        return
-        #raise AccountValidationError(['saved meta was not json. saving paylod as is'])
-    for key in updated_meta:
-        meta_to_update[key] = updated_meta[key]
-    user_profile.meta = meta_to_update
-    user_profile.save()
 
 @helpers.intercept_errors(errors.UserAPIInternalError, ignore_errors=[errors.UserAPIRequestError])
 def update_account_settings(requesting_user, update, username=None):
