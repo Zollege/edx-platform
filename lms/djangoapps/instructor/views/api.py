@@ -1247,7 +1247,7 @@ def get_issued_certificates(request, course_id):
 @require_POST
 @ensure_csrf_cookie
 @cache_control(no_cache=True, no_store=True, must_revalidate=True)
-@require_course_permission(permissions.CAN_RESEARCH)
+@require_course_permission(permissions.VIEW_DASHBOARD)
 @common_exceptions_400
 def get_students_features(request, course_id, csv=False):  # pylint: disable=redefined-outer-name
     """

@@ -943,7 +943,7 @@ class CourseEnrollmentsApiListView(DeveloperErrorViewMixin, ListAPIView):
         BearerAuthenticationAllowInactiveUser,
         SessionAuthenticationAllowInactiveUser,
     )
-    permission_classes = (permissions.IsAdminUser,)
+    permission_classes = (permissions.IsAdminUser,permissions.IsCourseStaffInstructor,)
     throttle_classes = (EnrollmentUserThrottle,)
     serializer_class = CourseEnrollmentsApiListSerializer
     pagination_class = CourseEnrollmentsApiListPagination
